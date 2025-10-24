@@ -5,7 +5,7 @@ import tokenB as tk
 
 token = tk.token
 
-bot = commands.Bot(command_prefix='-', intents=discord.Intents.all(), case_insensitive=True, strip_after_prefix=True)
+bot = commands.Bot(command_prefix='-', intents=discord.Intents.all(), case_insensitive=True, strip_after_prefix=True, help_command=None)
 
 # Leitura de Comandos na pasta 'comandos'
 
