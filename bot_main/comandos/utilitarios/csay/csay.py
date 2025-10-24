@@ -5,6 +5,24 @@ class ChannelSayCmd(commands.Cog):
     def __init__(self, bot):
         
         self.bot = bot
+        self.help_text = """
+        **Comando:** -csay
+        **Parâmetros:** 
+        - `#canal` ou `id_canal` (opcional): Canal de destino
+        - `mensagem` (str): Mensagem a ser enviada
+        
+        **Descrição:** Faz o bot enviar uma mensagem em um canal específico ou no canal atual. A mensagem original do usuário é deletada.
+        
+        **Uso:** 
+        - `-csay <mensagem>` (envia no canal atual)
+        - `-csay #canal <mensagem>` (envia no canal mencionado)
+        - `-csay <id_canal> <mensagem>` (envia no canal pelo ID)
+        
+        **Exemplo:** 
+        - `-csay Olá, mundo!`
+        - `-csay #geral Bem-vindos!`
+        - `-csay 123456789012345678 Mensagem`
+        """
         
 
     @commands.command()

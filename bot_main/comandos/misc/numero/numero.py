@@ -6,6 +6,24 @@ import random
 class AdvNum(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.help_text = """
+        **Comando:** -numero
+        **Parâmetros:** Nenhum
+        
+        **Retorno:** Resultado do jogo de adivinhação
+        
+        **Descrição:** Jogo de adivinhação onde você deve descobrir um número entre 1 e 100 que o bot está pensando.
+        
+        **Uso:** `-numero`
+        
+        **Como jogar:**
+        1. Digite `-numero`
+        2. O bot pensará em um número entre 1 e 100
+        3. Envie seus palpites no chat
+        4. O bot dirá se seu palpite é maior ou menor
+        5. Você tem 3 chances de errar formato inválido
+        6. Tempo limite de 20 segundos por resposta
+        """
 
     @commands.command()
     async def numero(self, ctx):

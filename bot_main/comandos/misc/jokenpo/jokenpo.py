@@ -6,6 +6,22 @@ import random
 class JokenpoCmd(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.help_text = """
+        **Comando:** -jokenpo
+        **Parâmetros:** Nenhum
+        
+        **Retorno:** Resultado do jogo (Vitória/Derrota/Empate)
+        
+        **Descrição:** Joga pedra, papel ou tesoura contra o bot. Após usar o comando, escolha entre Pedra, Papel ou Tesoura.
+        
+        **Uso:** `-jokenpo`
+        
+        **Como jogar:** 
+        1. Digite `-jokenpo`
+        2. Aguarde a mensagem do bot
+        3. Responda com: Pedra, Papel ou Tesoura
+        4. Você tem 10 segundos para responder
+        """
 
     @commands.command()
     async def jokenpo(self, ctx):

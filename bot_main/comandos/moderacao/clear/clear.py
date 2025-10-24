@@ -3,6 +3,18 @@ from discord.ext import commands
 class ClearCmd(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.help_text = """
+        **Comando:** -clear
+        **Parâmetros:** 
+        - `quantidade` (int): Número de mensagens a serem deletadas
+        
+        **Permissões:** Gerenciar Mensagens
+        
+        **Descrição:** Deleta uma quantidade específica de mensagens no canal atual.
+        
+        **Uso:** `-clear <quantidade>`
+        **Exemplo:** `-clear 10` (deleta as últimas 10 mensagens)
+        """
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
