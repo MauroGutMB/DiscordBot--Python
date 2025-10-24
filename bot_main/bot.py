@@ -11,11 +11,28 @@ bot = commands.Bot(command_prefix='-', intents=discord.Intents.all(), case_insen
 
 async def ler_cmds():
     '''
-    Leitura de comandos do diretório especificado
+    Leitura de comandos do diretório especificado de forma recursiva
     '''
-    for arquivo in os.listdir('comandos'):
-        if arquivo.endswith('.py'):
-            await bot.load_extension(f'comandos.{arquivo[:-3]}')
+    categorias = ['moderacao', 'utilitarios', 'misc', 'outros']
+    
+    for categoria in categorias:
+        caminho_categoria = os.path.join('comandos', categoria)
+        
+        if os.path.exists(caminho_categoria) and os.path.isdir(caminho_categoria):
+            for comando_dir in os.listdir(caminho_categoria):
+                caminho_comando = os.path.join(caminho_categoria, comando_dir)
+                
+                if os.path.isdir(caminho_comando):
+                    # Procura pelo arquivo .py dentro do diretório do comando
+                    for arquivo in os.listdir(caminho_comando):
+                        if arquivo.endswith('.py'):
+                            # Carrega a extensão no formato: comandos.categoria.comando.arquivo
+                            extensao = f'comandos.{categoria}.{comando_dir}.{arquivo[:-3]}'
+                            try:
+                                await bot.load_extension(extensao)
+                                print(f'✓ Carregado: {extensao}')
+                            except Exception as e:
+                                print(f'✗ Erro ao carregar {extensao}: {e}')
 
 
 
