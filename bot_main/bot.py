@@ -13,7 +13,7 @@ async def ler_cmds():
     '''
     Leitura de comandos do diretório especificado de forma recursiva
     '''
-    categorias = ['moderacao', 'utilitarios', 'misc', 'outros']
+    categorias = ['moderacao', 'utilitarios', 'misc', 'outros', 'musica']
     
     for categoria in categorias:
         caminho_categoria = os.path.join('comandos', categoria)

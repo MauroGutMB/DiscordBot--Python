@@ -37,6 +37,7 @@ class HelpCmd(commands.Cog):
                 'moderacao': {'emoji': '🛡️', 'comandos': []},
                 'utilitarios': {'emoji': '🔧', 'comandos': []},
                 'misc': {'emoji': '🎮', 'comandos': []},
+                'musica': {'emoji': '🎵', 'comandos': []},
                 'outros': {'emoji': '⚙️', 'comandos': []}
             }
             
@@ -54,6 +55,8 @@ class HelpCmd(commands.Cog):
                             categorias['utilitarios']['comandos'].append(cmd.name)
                         elif 'misc' in module_path:
                             categorias['misc']['comandos'].append(cmd.name)
+                        elif 'musica' in module_path:
+                            categorias['musica']['comandos'].append(cmd.name)
                         elif 'outros' in module_path:
                             categorias['outros']['comandos'].append(cmd.name)
             
@@ -62,6 +65,7 @@ class HelpCmd(commands.Cog):
                 'moderacao': 'Moderação',
                 'utilitarios': 'Utilitários',
                 'misc': 'Diversão',
+                'musica': 'Música',
                 'outros': 'Outros'
             }
             
