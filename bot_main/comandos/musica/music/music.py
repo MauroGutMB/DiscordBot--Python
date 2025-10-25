@@ -11,10 +11,11 @@ class MusicPlayer(commands.Cog):
         self.bot = bot
         self.queues = {}  # Dicionário para armazenar filas por servidor
         self.now_playing = {}  # Música atual por servidor
+        self.volume_settings = {}  # Volume por servidor (padrão 0.5 = 50%)
         
-        # Configurações do yt-dlp
+        # Configurações do yt-dlp para melhor qualidade de áudio
         self.ytdl_format_options = {
-            'format': 'bestaudio/best',
+            'format': 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',
             'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
             'restrictfilenames': True,
             'noplaylist': False,
@@ -25,11 +26,18 @@ class MusicPlayer(commands.Cog):
             'no_warnings': True,
             'default_search': 'ytsearch',
             'source_address': '0.0.0.0',
+            'prefer_ffmpeg': True,
+            'keepvideo': False,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'best',
+            }],
         }
         
+        # Configurações FFmpeg otimizadas para alta qualidade
         self.ffmpeg_options = {
             'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-            'options': '-vn'
+            'options': '-vn -b:a 320k -ar 48000 -ac 2 -filter:a "volume=0.8, equalizer=f=100:width_type=h:width=200:g=2"'
         }
         
         self.ytdl = yt_dlp.YoutubeDL(self.ytdl_format_options)
@@ -45,8 +53,15 @@ class MusicPlayer(commands.Cog):
         **-shuffle** - Embaralha a fila de músicas
         **-queue** - Mostra a fila de músicas
         **-np** - Mostra a música tocando atualmente
+        **-volume [0-100]** - Ajusta ou mostra o volume atual
         
-        **Descrição:** Sistema completo de reprodução de músicas do YouTube e Spotify.
+        **Descrição:** Sistema completo de reprodução de músicas do YouTube e Spotify em alta qualidade (320kbps, 48kHz).
+        
+        **Qualidade de Áudio:**
+        - Bitrate: 320kbps
+        - Sample Rate: 48kHz
+        - Canais: Stereo (2.0)
+        - Equalização: Otimizada para Discord
         """
 
     def get_queue(self, guild_id):
@@ -107,7 +122,13 @@ class MusicPlayer(commands.Cog):
             self.now_playing[guild_id] = next_song
             
             try:
+                # Obter volume configurado ou usar padrão (50%)
+                volume = self.volume_settings.get(guild_id, 0.5)
+                
+                # Criar source de áudio com qualidade aprimorada
                 source = discord.FFmpegPCMAudio(next_song['url'], **self.ffmpeg_options)
+                # Aplicar transformador de volume
+                source = discord.PCMVolumeTransformer(source, volume=volume)
                 
                 ctx.voice_client.play(
                     source,
@@ -471,6 +492,70 @@ class MusicPlayer(commands.Cog):
             embed.add_field(name="📊 Próximas na fila", value=f"{len(queue)} músicas", inline=False)
         
         embed.set_footer(text=f"Solicitado por {ctx.author.name}", icon_url=ctx.author.avatar.url if ctx.author.avatar else None)
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def volume(self, ctx, volume: int = None):
+        """Ajusta o volume do bot (0-100)"""
+        
+        if volume is None:
+            # Mostrar volume atual
+            guild_id = ctx.guild.id
+            current_volume = int(self.volume_settings.get(guild_id, 0.5) * 100)
+            
+            embed = discord.Embed(
+                title="🔊 Volume Atual",
+                description=f"O volume está em **{current_volume}%**",
+                color=discord.Color.blue()
+            )
+            embed.add_field(
+                name="💡 Como ajustar",
+                value="Use `-volume <0-100>` para alterar\nExemplo: `-volume 75`"
+            )
+            return await ctx.send(embed=embed)
+        
+        if not 0 <= volume <= 100:
+            embed = discord.Embed(
+                title="❌ Erro",
+                description="O volume deve estar entre **0** e **100**!",
+                color=discord.Color.red()
+            )
+            return await ctx.send(embed=embed)
+        
+        guild_id = ctx.guild.id
+        volume_float = volume / 100
+        self.volume_settings[guild_id] = volume_float
+        
+        # Ajustar volume da música atual se estiver tocando
+        if ctx.voice_client and ctx.voice_client.source:
+            ctx.voice_client.source.volume = volume_float
+        
+        # Criar barra de volume visual
+        bars_filled = int(volume / 10)
+        bars_empty = 10 - bars_filled
+        volume_bar = "█" * bars_filled + "░" * bars_empty
+        
+        embed = discord.Embed(
+            title="🔊 Volume Ajustado",
+            description=f"Volume definido para **{volume}%**",
+            color=discord.Color.green()
+        )
+        embed.add_field(
+            name="Volume",
+            value=f"`{volume_bar}` {volume}%",
+            inline=False
+        )
+        
+        # Adicionar emoji baseado no nível
+        if volume == 0:
+            embed.set_footer(text="🔇 Silenciado")
+        elif volume < 33:
+            embed.set_footer(text="🔉 Volume baixo")
+        elif volume < 66:
+            embed.set_footer(text="🔉 Volume médio")
+        else:
+            embed.set_footer(text="🔊 Volume alto")
+        
         await ctx.send(embed=embed)
 
 
